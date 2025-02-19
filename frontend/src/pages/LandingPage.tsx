@@ -1,9 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
 
-const LandingPage = () => {
+interface LandingPageProps {
+    account: string | null;
+    setAccount: (account: string | null) => void;
+}
+
+const LandingPage = ({ account, setAccount }: LandingPageProps) => {
     const [isConnecting, setIsConnecting] = useState(false);
-    const [account, setAccount] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const connectWallet = async () => {
         if (typeof window.ethereum === 'undefined') {
@@ -16,6 +22,9 @@ const LandingPage = () => {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const accounts = await provider.send("eth_requestAccounts", []);
             setAccount(accounts[0]);
+            
+            // Navigate to policies page after successful connection
+            navigate('/policies');
         } catch (error) {
             console.error('Error connecting wallet:', error);
         } finally {
@@ -68,9 +77,14 @@ const LandingPage = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-cyber-aqua to-cyber-accent rounded-lg opacity-0 group-hover:opacity-20 transition-opacity"></div>
                         </button>
                     ) : (
-                        <div className="bg-cyber-blue/30 text-cyber-aqua py-4 px-8 rounded-lg inline-block backdrop-blur-sm border border-cyber-aqua/30">
-                            Connected: {account.slice(0, 6)}...{account.slice(-4)}
-                        </div>
+                        <button
+                            onClick={() => navigate('/policies')}
+                            className="relative group px-8 py-4 bg-gradient-to-r from-cyber-aqua to-cyber-accent rounded-lg text-white font-semibold 
+                                     transform transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(79,209,197,0.4)]"
+                        >
+                            <span className="relative z-10">View My Policies</span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-cyber-aqua to-cyber-accent rounded-lg opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                        </button>
                     )}
 
                     {/* Feature cards */}
